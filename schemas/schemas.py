@@ -1,9 +1,7 @@
-from marshmallow import Schema, fields, ValidationError
+from marshmallow import Schema, fields
+from services.registro_service import no_special_characters
 
-def no_special_characters(value):
-    import re
-    if re.search(r'[^a-zA-Z0-9 ]', value):
-        raise ValidationError("El campo contiene caracteres especiales no permitidos.")
+
 
 class RegistroSchema(Schema):
     id = fields.Int(required=True, error_messages={"required": "El id es obligatorio.", "invalid": "Debe ser un numero entero."})
