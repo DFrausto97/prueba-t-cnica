@@ -15,15 +15,48 @@ Este proyecto es una aplicación backend desarrollada en Flask que permite:
 -   Flask-SQLAlchemy
 -   Marshmallow (para la validación de datos)
 -   Pandas (para el procesamiento de archivos)
+-   Docker
+-   PostgreSQL
 
 ## Requisitos Previos
 
 Antes de comenzar, asegúrate de tener instalado:
 
 -   Python 3.13.0
--   pip (para gestionar las dependencias)
+-   Docker y Docker Compose (para ejecutar la aplicación en contenedores)
+-   pip (para gestionar las dependencias si decides ejecutarlo sin Docker)
 
 ## Instalación
+
+### Opción 1: Instalación con Docker
+
+1. Clona este repositorio:
+
+    git clone https://github.com/DFrausto97/prueba-t-cnica.git
+
+2. Navega al directorio del proyecto:
+
+    cd prueba-t-cnica
+
+3. Asegúrate de que Docker esté instalado y funcionando en tu sistema.
+
+4. Construye y levanta los contenedores (incluye PostgreSQL y la aplicación Flask):
+
+    docker-compose up --build
+
+    Esto descargará las imágenes necesarias, construirá los contenedores y levantará la aplicación Flask en conjunto con una base de datos PostgreSQL.
+
+5. Crear las migraciones:
+
+    docker-compose run web flask db init  
+    docker-compose run web flask db migrate
+    docker-compose run web flask db upgrade
+
+6. Accede a la aplicación desde tu navegador o desde herramientas como Postman en la siguiente URL:
+
+    http://localhost:5000
+
+### Opción 2: Instalación Manual
 
 1. Clona este repositorio:
 
@@ -42,11 +75,13 @@ Antes de comenzar, asegúrate de tener instalado:
 
     pip install -r requirements.txt
 
-5. Ejecuta la aplicación:
+5. Configura la base de datos PostgreSQL (debes tener PostgreSQL instalado en tu máquina o usar otro servidor remoto).
+
+6. Ejecuta la aplicación:
 
     python app.py
 
-### 6. Uso de la Aplicación
+### Uso de la Aplicación
 
 Instrucciones sobre cómo utilizar la aplicación una vez configurada.
 

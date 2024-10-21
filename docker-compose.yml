@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+    db:
+        image: postgres:13
+        environment:
+            POSTGRES_USER: usuario
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: gestion_registros
+        ports:
+            - 5432:5432
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - app-network
+
+    pgadmin:
+        image: dpage/pgadmin4
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=admin@mail.com
+            - PGADMIN_DEFAULT_PASSWORD=root
+        ports:
+            - 5050:80
+        networks:
+            - app-network
+
+    web:
+        build: .
+        command: python app.py
+        volumes:
+            - .:/app
+        ports:
+            - '5000:5000'
+        environment:
+            DATABASE_URL: postgresql://usuario:password@db:5432/gestion_registros
+        depends_on:
+            - db
+        networks:
+            - app-network
+
+volumes:
+    postgres_data:
+
+networks:
+    app-network:
