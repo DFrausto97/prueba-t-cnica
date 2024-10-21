@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from marshmallow import ValidationError
 from models.registro import Registro
 from schemas.schemas import RegistroSchema
@@ -94,3 +94,8 @@ def get_by_id(id):
     
     result = registro_schema.dump(registro)  # Serializar el resultado
     return jsonify(result), 200
+
+# Endpoint para obtener todos los registros
+@registro_bp.route('/')
+def upload_form():
+    return render_template('upload.html')

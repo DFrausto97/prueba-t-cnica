@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gestión de Registros</title>
+        <style>
+            /* Estilos generales */
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+
+            .container {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                max-width: 500px;
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+                color: #333;
+                text-align: center;
+            }
+
+            /* Estilos de las pestañas */
+            .tab {
+                display: flex;
+                cursor: pointer;
+                justify-content: space-around;
+                margin-bottom: 20px;
+            }
+
+            .tab button {
+                background-color: #eeeeee;
+                border: none;
+                color: rgb(0, 0, 0);
+                padding: 10px;
+                width: 50%;
+                font-size: 16px;
+                border-radius: 5px;
+                transition: background-color 0.3s ease;
+            }
+
+            .tab button.active {
+                background-color: #bbbbbb;
+            }
+
+            .tabcontent {
+                display: none;
+            }
+
+            .tabcontent.active {
+                display: block;
+            }
+
+            .file-input,
+            .text-input {
+                padding: 10px;
+                font-size: 16px;
+                margin-bottom: 20px;
+                width: 95%;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            .submit-btn {
+                background-color: #007bff;
+                color: white;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background-color 0.3s ease;
+                width: 100%;
+            }
+
+            .submit-btn:hover {
+                background-color: #0056b3;
+            }
+
+            .alert {
+                display: none;
+                margin-top: 20px;
+                padding: 10px;
+                color: white;
+                background-color: #28a745;
+                border-radius: 5px;
+                word-wrap: break-word;
+            }
+
+            .alert.error {
+                background-color: #dc3545;
+            }
+
+            /* Responsividad */
+            @media (max-width: 600px) {
+                .container {
+                    padding: 15px;
+                }
+
+                h1 {
+                    font-size: 20px;
+                }
+
+                .submit-btn {
+                    padding: 10px 15px;
+                    font-size: 14px;
+                }
+            }
+        </style>
+
+        <script>
+            function openTab(evt, tabName) {
+                const tabContents = document.querySelectorAll('.tabcontent');
+                const tabButtons = document.querySelectorAll('.tab button');
+
+                tabContents.forEach(content =>
+                    content.classList.remove('active')
+                );
+                tabButtons.forEach(button => button.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
+                document.getElementById('title').innerHTML =
+                    tabName === 'searchTab'
+                        ? 'Buscar Registros'
+                        : 'Subir Registros';
+
+                evt.currentTarget.classList.add('active');
+            }
+
+            async function uploadFile(event) {
+                event.preventDefault();
+
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                const allowedExtensions = ['csv', 'txt'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                if (!allowedExtensions.includes(fileExtension)) {
+                    showAlert(
+                        'Error: Solo se permiten archivos .csv o .txt',
+                        'error'
+                    );
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (data.errors) {
+                            showAlert(
+                                `Lineas procesadas: ${data.processed.length} \n` +
+                                    data.processed.map(item => `${item} \n`) +
+                                    '\n' +
+                                    `Lineas no procesadas: ${data.errors.length} \n` +
+                                    data.errors.map(item => `${item} \n`)
+                            );
+                        } else {
+                            showAlert('Archivo subido con éxito');
+                        }
+                    } else {
+                        const errorMessages = data.errors.join('\n');
+                        showAlert('Error:\n' + errorMessages, 'error');
+                    }
+                } catch (error) {
+                    showAlert('Error en el envío: ' + error.message, 'error');
+                }
+            }
+
+            async function searchById(event) {
+                event.preventDefault();
+
+                const idInput = document.getElementById('idInput');
+                const id = idInput.value;
+
+                // Validación para asegurar que solo se envíen números positivos
+                if (!id || isNaN(id) || id <= 0) {
+                    showAlert(
+                        'Error: Debes ingresar un número positivo válido como ID',
+                        'error'
+                    );
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/registros/${id}`);
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showAlert(
+                            'Registro encontrado:\n' +
+                                JSON.stringify(data, null, 2)
+                        );
+                    } else {
+                        showAlert('Error: ' + data.error, 'error');
+                    }
+                } catch (error) {
+                    showAlert(
+                        'Error en la búsqueda: ' + error.message,
+                        'error'
+                    );
+                }
+            }
+
+            function showAlert(message, type = '') {
+                const alertBox = document.getElementById('alertBox');
+                alertBox.innerHTML = message.replace(/\n/g, '<br>');
+                alertBox.classList.remove('error');
+                if (type === 'error') {
+                    alertBox.classList.add('error');
+                }
+                alertBox.style.display = 'block';
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="tab">
+                <button class="active" onclick="openTab(event, 'uploadTab')">
+                    Subir Archivo
+                </button>
+                <button onclick="openTab(event, 'searchTab')">
+                    Buscar por ID
+                </button>
+            </div>
+            <div>
+                <h1 id="title">Subir Registros</h1>
+
+                <!-- Pestaña de subir archivo -->
+                <div id="uploadTab" class="tabcontent active">
+                    <form id="uploadForm" onsubmit="uploadFile(event)">
+                        <input
+                            type="file"
+                            id="fileInput"
+                            name="file"
+                            class="file-input"
+                            accept=".csv, .txt"
+                            required
+                        />
+                        <button type="submit" class="submit-btn">Subir</button>
+                    </form>
+                </div>
+
+                <!-- Pestaña de buscar por ID -->
+                <div id="searchTab" class="tabcontent">
+                    <form id="searchForm" onsubmit="searchById(event)">
+                        <input
+                            type="number"
+                            id="idInput"
+                            name="id"
+                            class="text-input"
+                            placeholder="Ingresa el ID del registro"
+                            required
+                        />
+                        <button type="submit" class="submit-btn">Buscar</button>
+                    </form>
+                </div>
+
+                <!-- Caja de alerta -->
+                <div id="alertBox" class="alert"></div>
+            </div>
+        </div>
+    </body>
+</html>
