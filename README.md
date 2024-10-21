@@ -118,3 +118,19 @@ Instrucciones sobre cómo utilizar la aplicación una vez configurada.
    Haz clic en "Send".
 4. Revisa la respuesta:
    Observa la respuesta en la parte inferior de Postman.
+
+## Pagina web
+
+En tu navegador, ingresa a la URL que te da al correr la aplicación, por ejemplo: http://localhost:5000/ y te mostrara un template donde podrás subir archivos y buscar registros por id.
+
+### Subir un archivo
+
+1. Ve a la pestaña "Subir Archivo".
+2. Selecciona un archivo CSV o TXT con los registros que deseas cargar.
+3. Haz clic en "Subir" y verás los resultados en un mensaje de alerta.
+
+### Buscar un registro por ID
+
+1. Ve a la pestaña "Buscar por ID".
+2. Ingresa el ID del registro que deseas buscar y haz clic en "Buscar".
+3. Si el registro existe, los detalles del mismo aparecerán en un mensaje de alerta.
