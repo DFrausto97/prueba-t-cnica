@@ -14,6 +14,7 @@ Este proyecto es una aplicación backend desarrollada en Flask que permite:
 -   Flask
 -   Flask-SQLAlchemy
 -   Marshmallow (para la validación de datos)
+-   Pandas (para el procesamiento de archivos)
 
 ## Requisitos Previos
 
