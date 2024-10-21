@@ -94,3 +94,8 @@ def get_by_id(id):
     
     result = registro_schema.dump(registro)  # Serializar el resultado
     return jsonify(result), 200
+
+# Ruta para interactuar mediante el template
+@registro_bp.route('/')
+def upload_form():
+    return render_template('upload.html')
