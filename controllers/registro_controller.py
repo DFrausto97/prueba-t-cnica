@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from marshmallow import ValidationError
 from models.registro import Registro
 from schemas.schemas import RegistroSchema
